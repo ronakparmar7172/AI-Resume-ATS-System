@@ -1,0 +1,7 @@
+django
+nltk
+PyPDF2
+docx2txt
+scikit-learn
+sentence-transformers
+torch

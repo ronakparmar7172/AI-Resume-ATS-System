@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume ATS Dashboard</title>
+    <link rel="stylesheet" href="{% static 'dashboard.css' %}">
+</head>
+<body>
+
+<div class="navbar">
+    <h1>AI Resume ATS Analyzer</h1>
+    <p>Upload • Analyze • Improve Your Resume</p>
+</div>
+
+<div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h2>Upload Details</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <label class="label">Upload Resume(s)</label>
+            <div class="upload-box">
+                <input type="file" id="resumeInput" name="resumes" multiple required>
+                <p>📄 PDF / DOCX / TXT supported</p>
+                <div id="fileNames"></div>
+            </div>
+
+            <label class="label">Job Description</label>
+            <textarea name="job_description"
+                placeholder="Paste the job description here (skills, tools, responsibilities)..."
+                required></textarea>
+
+            <button class="analyze-btn">Analyze Resume</button>
+        </form>
+
+        <div class="help-box">
+            <h3>💡 Tips for Better ATS Score</h3>
+            <ul>
+                <li>Use exact keywords from job description</li>
+                <li>Add projects with tools & technologies</li>
+                <li>Avoid tables, images & graphics</li>
+                <li>Use clear headings: Skills, Experience</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+        {% if results %}
+            {% for r in results %}
+            <div class="result-card">
+                <h2>{{ r.name }}</h2>
+
+                <div class="score-circle">
+                    {{ r.score }}%
+                </div>
+
+                <p class="sub">Semantic Match: {{ r.semantic }}%</p>
+                <p class="sub">Skill Match: {{ r.skills }}%</p>
+
+                <div class="section">
+                    <h4>✅ Matched Skills</h4>
+                    {% for s in r.matched %}
+                        <span class="tag green">{{ s }}</span>
+                    {% empty %}
+                        <p>No matched skills found</p>
+                    {% endfor %}
+                </div>
+
+                <div class="section">
+                    <h4>❌ Missing Skills</h4>
+                    {% for s in r.missing %}
+                        <span class="tag red">{{ s }}</span>
+                    {% empty %}
+                        <p>No missing skills 🎉</p>
+                    {% endfor %}
+                </div>
+
+                <div class="improve-box">
+                    <h4>📌 How to Improve Your Resume</h4>
+                    <ul>
+                        {% for t in r.tips %}
+                            <li>{{ t }}</li>
+                        {% empty %}
+                            <li>Your resume is well optimized for this role</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align:center; color:gray; margin-top:50px;">
+                <h3>No results yet</h3>
+                <p>Upload resume(s) and job description to see ATS analysis.</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+</div>
+
+<script src="{% static 'upload.js' %}"></script>
+</body>
+</html>
